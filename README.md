@@ -6,4 +6,4 @@ Học kỳ 1, Năm học 2025-2026
 
 **MSSV**: B2306592
 
-**Họ tên SV**: Trương Bữu Toàn
+**Họ tên SV**: Trương Bữu Toàna

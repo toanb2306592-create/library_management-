@@ -1,11 +1,10 @@
-// main.js
-import { createApp } from 'vue'
-import App from './App.vue'
-import router from './router/index.js' // Thay thế bằng đường dẫn đến file router của bạn
+//import './assets/main.css'
+import router from "./router";
 
-const app = createApp(App)
+import { createApp } from "vue";
+import App from "./App.vue";
 
-// PHẢI CÓ DÒNG NÀY
-app.use(router) 
 
-app.mount('#app')
+
+createApp(App).use(router).mount("#app");
+

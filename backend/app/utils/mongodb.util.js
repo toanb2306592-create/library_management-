@@ -1,11 +1,19 @@
 const { MongoClient } = require("mongodb");
 
-class MongoDB {
-  static connect = async (uri) => {
-    if (this.client) return this.client;
-    this.client = await MongoClient.connect(uri);
-    return this.client;
-  };
+let client = null;
+
+async function connect(uri) {
+  if (!client) {
+    client = new MongoClient(uri);
+    await client.connect();
+    console.log("Kết nối MongoDB thành công");
+  }
+  return client;
 }
 
-module.exports = MongoDB;
+async function getCollection(collectionName, dbName = "libraryDB") {
+  const client = await connect("mongodb://localhost:27017");
+  return client.db(dbName).collection(collectionName);
+}
+
+module.exports = { connect, getCollection };

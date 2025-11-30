@@ -10,7 +10,6 @@
           Thư viện số cung cấp hàng ngàn đầu sách đa dạng, từ lập trình, kỹ năng, khoa học xã hội, đến văn học nghệ thuật. 
           Chúng tôi giúp bạn tiếp cận tri thức mọi lúc, mọi nơi. Hãy tham gia cộng đồng đọc sách của chúng tôi và khám phá thế giới tri thức phong phú.
         </p>
-        <button @click="$router.push('/signup')">Đăng ký thành viên</button>
       </div>
     </div>
   </section>

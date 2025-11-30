@@ -11,9 +11,10 @@
       <nav class="nav">
         <ul>
           <li><router-link to="/">Trang chủ</router-link></li>
-          <li><a href="#">Sách</a></li>
-          <li><a href="#">Mượn trả</a></li>
-          <li><a href="#">Liên hệ</a></li>
+          <li><router-link to="/book">Sách</router-link></li>
+          <li><router-link to="/publisher">Nhà xuất bản</router-link></li>
+          <li><router-link to="/employee">Nhân viên</router-link></li>
+          <li><router-link to="/borrow">Quản lý mượn sách</router-link></li>
         </ul>
       </nav>
 
@@ -23,11 +24,7 @@
         <button><i class="fas fa-search"></i></button>
       </div>
 
-      <!-- Đăng nhập / Đăng ký -->
-      <div class="auth">
-        <router-link to="/login" class="router-button">Đăng nhập</router-link>
-        <router-link to="/signup" class="router-button">Đăng ký thành viên</router-link>
-      </div>
+
     </div>
   </header>
 </template>
@@ -38,30 +35,40 @@ export default {
   data() {
     return {
       lastScroll: 0,
-      faded: false
+      faded: false,
+      dropdownOpen: false,
+      user: null,
     };
   },
   mounted() {
     window.addEventListener("scroll", this.handleScroll);
+    document.addEventListener("click", this.handleClickOutside);
+    this.loadUser();
   },
   beforeUnmount() {
     window.removeEventListener("scroll", this.handleScroll);
+    document.removeEventListener("click", this.handleClickOutside);
   },
   methods: {
     handleScroll() {
       const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-      
-      if (currentScroll > this.lastScroll && currentScroll > 50) {
-        // Kéo xuống → làm mờ
-        this.faded = true;
-      } else if (currentScroll < this.lastScroll - 5) {
-        // Kéo lên chỉ 5px → hiện lại
-        this.faded = false;
-      }
-      
+      this.faded = currentScroll > this.lastScroll && currentScroll > 50;
       this.lastScroll = currentScroll <= 0 ? 0 : currentScroll;
-    }
-  }
+    },
+    loadUser() {
+      const userData = localStorage.getItem("user");
+      if (userData) this.user = JSON.parse(userData);
+    },
+    toggleDropdown() {
+      this.dropdownOpen = !this.dropdownOpen;
+    },
+    handleClickOutside(event) {
+      const dropdown = this.$refs.dropdownRef;
+      if (dropdown && !dropdown.contains(event.target)) {
+        this.dropdownOpen = false;
+      }
+    },
+  },
 };
 </script>
 
@@ -170,6 +177,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  position: relative;
 }
 
 .router-button {
@@ -185,6 +193,49 @@ export default {
 
 .router-button:hover {
   background-color: #444442;
+}
+
+/* Dropdown nhân viên */
+.user-dropdown {
+  background-color: #ffd700;
+  color: #2a2f45;
+  padding: 0.5rem 1rem;
+  border-radius: 30px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  position: relative;
+  user-select: none;
+}
+
+.user-dropdown i {
+  font-size: 0.8rem;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background-color: #2a2f45;
+  color: #f0f0f0;
+  list-style: none;
+  padding: 0.5rem 0;
+  border-radius: 10px;
+  min-width: 160px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  z-index: 200;
+}
+
+.dropdown-menu li {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.dropdown-menu li:hover {
+  background-color: #444;
 }
 
 @media (max-width: 900px) {

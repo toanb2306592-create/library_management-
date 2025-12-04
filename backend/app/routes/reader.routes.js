@@ -1,14 +1,10 @@
 const express = require("express");
-const ReaderController = require("../controllers/reader.controller");
 const router = express.Router();
+const readerController = require("../controllers/reader.controller");
 
-router.route("/")
-  .get(ReaderController.findAll)
-  .post(ReaderController.create);
+router.post("/signup", readerController.signup);
+router.post("/login", readerController.login);
 
-router.route("/:MaDG")
-  .get(ReaderController.findOne)
-  .put(ReaderController.update)
-  .delete(ReaderController.delete);
+router.get("/:id", readerController.getById);
 
 module.exports = router;

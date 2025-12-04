@@ -1,7 +1,7 @@
 const EmployeeModel = require("../models/employee.model");
 const { ObjectId } = require("mongodb");
 const bcrypt = require("bcryptjs");
-const ApiError = require("../api-error"); // nếu có dùng middleware bắt lỗi
+const ApiError = require("../api-error");
 
 class EmployeeController {
   static async create(req, res, next) {

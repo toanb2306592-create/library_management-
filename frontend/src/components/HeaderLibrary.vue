@@ -1,35 +1,59 @@
 <template>
   <header :class="['header', { faded }]">
     <div class="header-container">
-      <!-- Logo / Tên thư viện -->
+      <!-- Logo -->
       <div class="logo">
         <img src="/library-icon.png" alt="Library Icon" />
-        <router-link to="/" style="text-decoration: none;"><h2>BookSelf</h2></router-link>
+        <router-link to="/" style="text-decoration: none;">
+          <h2>BookSelf</h2>
+        </router-link>
       </div>
 
-      <!-- Menu điều hướng -->
+      <!-- Menu -->
       <nav class="nav">
         <ul>
           <li><router-link to="/">Trang chủ</router-link></li>
-          <li><router-link to="/book">Sách</router-link></li>
-          <li><router-link to="/publisher">Nhà xuất bản</router-link></li>
-          <li><router-link to="/employee">Nhân viên</router-link></li>
-          <li><router-link to="/borrow">Quản lý mượn sách</router-link></li>
+          <template v-if="store.user?.email === 'admin@gmail.com'">
+            <li><router-link to="/book">Sách</router-link></li>
+            <li><router-link to="/publisher">Nhà xuất bản</router-link></li>
+            <li><router-link to="/employee">Nhân viên</router-link></li>
+            <li><router-link to="/borrow">Quản lý mượn sách</router-link></li>
+          </template>
+          <template v-if="store.user?.email !== 'admin@gmail.com'">
+            <li><router-link to="/borrow-book">Mượn sách</router-link></li>
+          </template>
         </ul>
       </nav>
 
-      <!-- Tìm kiếm sách -->
-      <div class="search">
-        <input type="text" placeholder="Tìm kiếm sách..." />
-        <button><i class="fas fa-search"></i></button>
+      <div class="auth">
+        <template v-if="!store.user">
+          <router-link to="/login" class="router-button">Đăng nhập</router-link>
+          <router-link to="/register" class="router-button">Đăng ký</router-link>
+        </template>
+
+        <template v-else>
+          <div class="user-dropdown" ref="dropdownRef" @click="toggleDropdown">
+            <i class="fas fa-user"></i>
+            {{ store.user.Ten }}
+            <i class="fas fa-caret-down"></i>
+          </div>
+
+          <ul v-if="dropdownOpen" class="dropdown-menu">
+            <template v-if="store.user?.email !== 'admin@gmail.com'">
+              <li @click="$router.push('/borrow-history')">Lịch sử mượn</li>
+            </template>
+            <li @click="logout">Đăng xuất</li>
+          </ul>
+        </template>
       </div>
-
-
     </div>
   </header>
 </template>
 
 <script>
+import axios from "axios";
+import { store } from "@/store.js";
+
 export default {
   name: "HeaderLibrary",
   data() {
@@ -37,38 +61,76 @@ export default {
       lastScroll: 0,
       faded: false,
       dropdownOpen: false,
-      user: null,
+      searchText: "",
+      books: [],          // toàn bộ sách từ backend
+      filteredBooks: []   // sách matching search
     };
+  },
+  setup() {
+    return { store };
   },
   mounted() {
     window.addEventListener("scroll", this.handleScroll);
     document.addEventListener("click", this.handleClickOutside);
-    this.loadUser();
+    this.loadBooks();
   },
   beforeUnmount() {
     window.removeEventListener("scroll", this.handleScroll);
     document.removeEventListener("click", this.handleClickOutside);
   },
   methods: {
+    // Lấy toàn bộ sách để filter
+    async loadBooks() {
+      try {
+        const res = await axios.get("http://localhost:3000/api/books");
+        this.books = res.data;
+        this.filteredBooks = res.data;
+      } catch (err) {
+        console.error("Không tải được danh sách sách:", err);
+      }
+    },
+
+
+    goToBookDetail(bookId) {
+      this.searchText = "";
+      this.$router.push({ name: "BookDetail", params: { id: bookId } });
+    },
+
+
+    getBookImage(book) {
+      if (!book.image) return "/default-book.png";
+      const img = Array.isArray(book.image) ? book.image[0] : book.image;
+      if (typeof img === "string") {
+        if (img.startsWith("data:")) return img;
+        return `data:image/jpeg;base64,${img}`;
+      }
+      return "/default-book.png";
+    },
+
     handleScroll() {
       const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
       this.faded = currentScroll > this.lastScroll && currentScroll > 50;
-      this.lastScroll = currentScroll <= 0 ? 0 : currentScroll;
+      this.lastScroll = Math.max(0, currentScroll);
     },
-    loadUser() {
-      const userData = localStorage.getItem("user");
-      if (userData) this.user = JSON.parse(userData);
-    },
+
     toggleDropdown() {
       this.dropdownOpen = !this.dropdownOpen;
     },
+
+    logout() {
+      localStorage.removeItem("user");
+      store.user = null;
+      this.dropdownOpen = false;
+      this.$router.push("/login");
+    },
+
     handleClickOutside(event) {
       const dropdown = this.$refs.dropdownRef;
       if (dropdown && !dropdown.contains(event.target)) {
         this.dropdownOpen = false;
       }
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -135,6 +197,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  position: relative;
 }
 
 .search input {
@@ -171,6 +234,47 @@ export default {
 
 .search i {
   color: #2a2f45;
+}
+
+/* Dropdown kết quả search */
+.search-results {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  background-color: #2a2f45;
+  border-radius: 10px;
+  width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  z-index: 150;
+}
+
+.search-results ul {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0;
+}
+
+.search-results li {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: 0.2s;
+  color: #f0f0f0;
+}
+
+.search-results li:hover {
+  background-color: #444;
+}
+
+.book-thumb {
+  width: 30px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 3px;
 }
 
 .auth {

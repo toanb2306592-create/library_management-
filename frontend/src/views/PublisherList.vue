@@ -10,10 +10,12 @@
       <div class="modal">
         <h3>{{ editingPublisher ? "Sửa NXB" : "Thêm NXB mới" }}</h3>
         <div v-if="message" :class="['message', messageType]">{{ message }}</div>
+
         <form @submit.prevent="editingPublisher ? updatePublisher() : addPublisher()">
           <input v-model="currentPublisher.MaNXB" placeholder="Mã NXB" required />
           <input v-model="currentPublisher.TenNXB" placeholder="Tên NXB" required />
           <input v-model="currentPublisher.DiaChi" placeholder="Địa chỉ" />
+
           <div class="modal-buttons">
             <button type="submit">{{ editingPublisher ? "Lưu" : "Thêm" }}</button>
             <button type="button" @click="closeModal">Hủy</button>
@@ -40,6 +42,7 @@
             <th>Hành động</th>
           </tr>
         </thead>
+
         <tbody>
           <tr v-for="(pub, index) in filteredPublishers" :key="pub._id">
             <td>{{ index + 1 }}</td>
@@ -51,6 +54,7 @@
               <button class="delete-btn" @click="deletePublisher(pub._id)">Xóa</button>
             </td>
           </tr>
+
           <tr v-if="filteredPublishers.length === 0">
             <td colspan="5" class="no-data">Không có dữ liệu</td>
           </tr>
@@ -65,6 +69,7 @@ import PublisherService from "@/services/publisher.service";
 
 export default {
   name: "PublisherList",
+
   data() {
     return {
       publishers: [],
@@ -76,6 +81,7 @@ export default {
       messageType: ""
     };
   },
+
   computed: {
     filteredPublishers() {
       if (!this.searchName) return this.publishers;
@@ -84,6 +90,7 @@ export default {
       );
     }
   },
+
   methods: {
     async fetchPublishers() {
       try {
@@ -93,10 +100,12 @@ export default {
         console.error(err);
       }
     },
+
     async addPublisher() {
       try {
         const res = await PublisherService.create(this.currentPublisher);
         this.publishers.push(res.data);
+
         this.closeModal();
         this.message = "Thêm NXB thành công!";
         this.messageType = "success";
@@ -105,20 +114,39 @@ export default {
         this.messageType = "error";
       }
     },
+
     editPublisher(pub) {
       this.editingPublisher = true;
       this.showAddModal = true;
       this.currentPublisher = { ...pub };
     },
-    async updatePublisher() {
+
+     async updatePublisher() {
       try {
-        // Nếu backend update chưa có, bạn cần viết API PUT /api/publishers/:id
-        alert("Bạn cần thêm API cập nhật NXB trước khi dùng tính năng này.");
+        await PublisherService.update(this.currentPublisher._id, this.currentPublisher);
+
+        // cập nhật ngay trong mảng
+        const index = this.publishers.findIndex(p => p._id === this.currentPublisher._id);
+        if (index !== -1) {
+          this.publishers[index] = { ...this.currentPublisher };
+        }
+
+        this.message = "Cập nhật thành công!";
+        this.messageType = "success";
+        this.closeModal();
       } catch (err) {
-        this.message = err.response?.data?.message || "Cập nhật thất bại";
+        this.message = err.response?.data?.message;
         this.messageType = "error";
       }
     },
+
+    async deletePublisher(id) {
+      if (!confirm("Bạn chắc chắn muốn xóa?")) return;
+
+      await PublisherService.delete(id);
+      this.publishers = this.publishers.filter(p => p._id !== id);
+    },
+
     closeModal() {
       this.showAddModal = false;
       this.editingPublisher = false;
@@ -126,17 +154,25 @@ export default {
       this.message = "";
       this.messageType = "";
     },
+
+    // ✅ Xóa NXB – API hoạt động đủ
     async deletePublisher(id) {
-      if (!confirm("Bạn có chắc muốn xóa NXB này không?")) return;
+      if (!confirm("Bạn có chắc muốn xóa nhà xuất bản này không?")) return;
+
       try {
-        // Nếu backend delete chưa có, bạn cần viết API DELETE /api/publishers/:id
-        alert("Bạn cần thêm API xóa NXB trước khi dùng tính năng này.");
-      } catch (err) {
-        console.error(err);
-        alert(err.response?.data?.message || "Xóa thất bại");
+        await PublisherService.delete(id);
+        alert("Xóa thành công!");
+
+        // Load lại danh sách
+        this.fetchPublishers();
+
+      } catch (error) {
+        console.error(error);
+        alert(error.response?.data?.message || "Lỗi khi xóa");
       }
-    }
+    },
   },
+
   mounted() {
     this.fetchPublishers();
   }

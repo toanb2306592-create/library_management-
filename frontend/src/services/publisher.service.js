@@ -1,11 +1,23 @@
 import axios from "axios";
-const API = "http://localhost:3000/api/publishers";
 
-export default {
+const API_URL = "http://localhost:3000/api/publishers";
+
+class PublisherService {
   getAll() {
-    return axios.get(API);
-  },
-  create(data) {
-    return axios.post(API, data);
+    return axios.get(API_URL);
   }
-};
+
+  create(data) {
+    return axios.post(API_URL, data);
+  }
+
+  update(id, data) {
+    return axios.put(`${API_URL}/${id}`, data);
+  }
+
+  delete(id) {
+    return axios.delete(`${API_URL}/${id}`);
+  }
+}
+
+export default new PublisherService();

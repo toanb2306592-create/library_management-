@@ -1,4 +1,5 @@
 const MongoDB = require("../utils/mongodb.util");
+const { ObjectId } = require("mongodb");
 
 class ReaderModel {
   static collectionName = "readers";
@@ -6,69 +7,24 @@ class ReaderModel {
 
   static async collection() {
     const client = await MongoDB.connect("mongodb://localhost:27017");
-    const db = client.db(this.dbName);
-    return db.collection(this.collectionName);
-  }
-
-  static generateMaDG() {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let code = "";
-    for (let i = 0; i < 6; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return code;
+    return client.db(this.dbName).collection(this.collectionName);
   }
 
   static async create(data) {
     const col = await this.collection();
-    if (!data.MaDG) {
-      let maDG, exists = true;
-      while (exists) {
-        maDG = this.generateMaDG();
-        exists = await col.findOne({ MaDG: maDG });
-      }
-      data.MaDG = maDG;
-    }
-
-    const newReader = {
-      ...data,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-
-    const result = await col.insertOne(newReader);
-    newReader._id = result.insertedId;
-    return newReader;
+    const result = await col.insertOne(data);
+    return { ...data, _id: result.insertedId };
   }
 
-  static async findByName(HoLot, Ten) {
+  static async findByEmail(email) {
     const col = await this.collection();
-    return col.findOne({
-      HoLot: { $regex: HoLot, $options: "i" },
-      Ten: { $regex: Ten, $options: "i" }
-    });
+    return col.findOne({ email });
   }
 
-  static async findAll() {
+  static async findById(id) {
     const col = await this.collection();
-    return col.find().sort({ createdAt: -1 }).toArray();
-  }
-
-  static async findOne(MaDG) {
-    const col = await this.collection();
-    return col.findOne({ MaDG });
-  }
-
-  static async update(MaDG, data) {
-    const col = await this.collection();
-    await col.updateOne({ MaDG }, { $set: { ...data, updatedAt: new Date() } });
-    return this.findOne(MaDG);
-  }
-
-  static async delete(MaDG) {
-    const col = await this.collection();
-    const result = await col.deleteOne({ MaDG });
-    return result.deletedCount === 1;
+    if (!ObjectId.isValid(id)) return null; // tránh crash nếu id không hợp lệ
+    return col.findOne({ _id: new ObjectId(id) });
   }
 }
 

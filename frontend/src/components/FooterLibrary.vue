@@ -12,10 +12,9 @@
       <div class="footer-nav">
         <h3>Điều hướng</h3>
         <ul>
-          <li><a href="#">Trang chủ</a></li>
-          <li><a href="#">Sách</a></li>
-          <li><a href="#">Mượn trả</a></li>
-          <li><a href="#">Liên hệ</a></li>
+          <li><a href="/">Trang chủ</a></li>
+          <li><a href="/book">Sách</a></li>
+          <li><a href="/borrow-book">Mượn trả</a></li>
         </ul>
       </div>
 
@@ -45,6 +44,11 @@ export default {
 </script>
 
 <style scoped>
+h2 {
+  margin: 0;
+  padding-right: 100px;
+}
+
 .footer {
   background: linear-gradient(90deg, #1c1c1c, #2a2f45);
   color: #f0f0f0;

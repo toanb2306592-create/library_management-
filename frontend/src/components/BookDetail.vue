@@ -14,7 +14,17 @@
           <p><strong>Năm xuất bản:</strong> {{ book.NamXuatBan }}</p>
           <p v-if="book.description"><strong>Mô tả:</strong> {{ book.description }}</p>
 
-          <button class="back-btn" @click="$router.back()">← Quay về</button>
+          <div class="buttons">
+            <button class="back-btn" @click="$router.back()">← Quay về</button>
+            <!-- Chỉ hiện nút mượn nếu không phải admin -->
+            <button
+              v-if="!isAdmin"
+              class="borrow-btn"
+              @click="borrowBook(book._id)"
+            >
+              📚 Mượn sách
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -34,24 +44,36 @@ export default {
   data() {
     return {
       book: null,
-      publishers: [] // Danh sách NXB từ backend
+      publishers: [],
+      user: null, // lưu thông tin user
     };
+  },
+  computed: {
+    isAdmin() {
+      return this.user?.email === "admin@gmail.com";
+    },
   },
   methods: {
     async fetchBook() {
       try {
+        // Lấy thông tin sách
         const [bookRes, publishersRes] = await Promise.all([
           BookService.get(this.$route.params.id),
           axios.get("http://localhost:3000/api/publishers")
         ]);
 
-        const publishers = publishersRes.data; // [{MaNXB, TenNXB}, ...]
+        const publishers = publishersRes.data;
         const book = bookRes.data;
 
         const nxb = publishers.find(p => p.MaNXB === book.MaNXB);
         book.TenNXB = nxb ? nxb.TenNXB : "NXB không xác định";
 
         this.book = book;
+
+        // Lấy thông tin user từ localStorage hoặc API
+        const userData = localStorage.getItem("user"); // ví dụ
+        this.user = userData ? JSON.parse(userData) : null;
+
       } catch (err) {
         console.error("Lỗi khi lấy thông tin sách:", err);
       }
@@ -64,6 +86,9 @@ export default {
         return `data:image/jpeg;base64,${img}`;
       }
       return "/default-book.png";
+    },
+    borrowBook(bookId) {
+      this.$router.push({ path: "/borrow-book", query: { bookId } });
     }
   },
   mounted() {
@@ -112,8 +137,13 @@ export default {
 .book-info p {
   margin-bottom: 0.7rem;
 }
-.back-btn {
+.buttons {
   margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.back-btn {
   background-color: #ffd700;
   color: #1f1f2e;
   border: none;
@@ -125,6 +155,19 @@ export default {
 }
 .back-btn:hover {
   background-color: #ffb700;
+}
+.borrow-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 0.6rem 1.3rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.borrow-btn:hover {
+  background-color: #218838;
 }
 .loading-text {
   text-align: center;

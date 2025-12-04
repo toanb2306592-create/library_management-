@@ -17,12 +17,12 @@ class BorrowModel {
       throw new Error("Ngày trả phải lớn hơn ngày mượn");
     }
 
-    await BookModel.changeQuantity(data.MaSach, -1);
+    
 
     const newBorrow = {
       ...data,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     const result = await (await this.collection()).insertOne(newBorrow);
@@ -56,6 +56,52 @@ class BorrowModel {
     if (filter.NgayMuon) query.NgayMuon = filter.NgayMuon;
     return col.find(query).sort({ createdAt: -1 }).toArray();
   }
+
+  static async updateStatus(id, status) {
+    const col = await this.collection();
+    const borrow = await col.findOne({ _id: new ObjectId(id) });
+    if (!borrow) throw new Error("Phiếu mượn không tồn tại");
+
+    await col.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { status, updatedAt: new Date() } }
+    );
+
+    if (status === 'Đã xác nhận') {
+        await BookModel.changeQuantity(borrow.MaSach, -1);
+    }
+
+    return await col.findOne({ _id: new ObjectId(id) });
+}
+
+
+  static async findById(id) {
+    const col = await this.collection();
+    return col.findOne({ _id: new ObjectId(id) });
+  }
+
+  static async deleteById(id) {
+    try {
+        const col = await this.collection();
+        if (!ObjectId.isValid(id)) {
+            return { success: false, message: "ID không hợp lệ" };
+        }
+        const borrow = await col.findOne({ _id: new ObjectId(id) });
+        if (!borrow) {
+            return { success: false, message: "Phiếu mượn không tồn tại" };
+        }
+        const result = await col.deleteOne({ _id: new ObjectId(id) });
+        if (result.deletedCount > 0) {
+            await BookModel.changeQuantity(borrow.MaSach, 1);
+            return { success: true, message: "Xóa phiếu mượn thành công, sách +1", deleted: borrow };
+        } else {
+            return { success: false, message: "Xóa thất bại" };
+        }
+    } catch (err) {
+        return { success: false, message: "Lỗi server: " + err.message };
+    }
+  }
+
 }
 
 module.exports = BorrowModel;

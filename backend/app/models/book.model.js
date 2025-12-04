@@ -60,6 +60,26 @@ class BookModel {
     const result = await col.deleteOne({ _id: new ObjectId(id) });
     return result.deletedCount > 0;
   }
+
+  static async countByPublisher(MaNXB) {
+    const col = await this.collection();
+    return col.countDocuments({ MaNXB });
+  }
+
+  static async changeQuantity(bookId, delta) {
+    const col = await this.collection();
+    const book = await col.findOne({ _id: new ObjectId(bookId) });
+    if (!book) throw new Error("Sách không tồn tại");
+
+    const newQuantity = (book.SoQuyen || 0) + delta;
+    if (newQuantity < 0) throw new Error("Số lượng sách không đủ");
+
+    await col.updateOne(
+      { _id: new ObjectId(bookId) },
+      { $set: { SoQuyen: newQuantity, updatedAt: new Date() } }
+    );
+    return newQuantity;
+  }
 }
 
 module.exports = BookModel;

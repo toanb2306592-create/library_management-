@@ -1,53 +1,37 @@
+const ReaderService = require("../services/reader.service");
 const ReaderModel = require("../models/reader.model");
 const ApiError = require("../api-error");
 
 class ReaderController {
-  static async create(req, res, next) {
+  async signup(req, res, next) {
     try {
-      const reader = await ReaderModel.create(req.body);
-      res.send(reader);
+      const reader = await ReaderService.register(req.body);
+      res.json({ message: "Đăng ký thành công!", reader });
     } catch (err) {
-      next(new ApiError(500, err.message || "Lỗi khi tạo đọc giả"));
+      next(new ApiError(400, err.message));
     }
   }
 
-  static async findAll(req, res, next) {
+  async login(req, res, next) {
     try {
-      const readers = await ReaderModel.findAll();
-      res.send(readers);
+      const result = await ReaderService.login(req.body);
+      res.json(result);
     } catch (err) {
-      next(new ApiError(500, "Lỗi khi lấy danh sách đọc giả"));
+      next(new ApiError(400, err.message));
     }
   }
 
-  static async findOne(req, res, next) {
+  async getById(req, res, next) {
     try {
-      const reader = await ReaderModel.findOne(req.params.MaDG);
-      if (!reader) throw new ApiError(404, "Đọc giả không tồn tại");
-      res.send(reader);
+      const reader = await ReaderModel.findById(req.params.id);
+      if (!reader) {
+        return next(new ApiError(404, "Người mượn không tồn tại"));
+      }
+      res.json(reader);
     } catch (err) {
-      next(err);
-    }
-  }
-
-  static async update(req, res, next) {
-    try {
-      const reader = await ReaderModel.update(req.params.MaDG, req.body);
-      res.send(reader);
-    } catch (err) {
-      next(new ApiError(500, err.message || "Lỗi khi cập nhật đọc giả"));
-    }
-  }
-
-  static async delete(req, res, next) {
-    try {
-      const deleted = await ReaderModel.delete(req.params.MaDG);
-      if (!deleted) throw new ApiError(404, "Đọc giả không tồn tại");
-      res.send({ message: "Xóa thành công" });
-    } catch (err) {
-      next(err);
+      next(new ApiError(500, "Lỗi server khi lấy người mượn"));
     }
   }
 }
 
-module.exports = ReaderController;
+module.exports = new ReaderController();

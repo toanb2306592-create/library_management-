@@ -26,6 +26,7 @@ app.use('/uploads', express.static('uploads'));
 app.use("/api/readers", readerRoutes);
 app.use("/api/borrows", borrowRoutes);
 
+
 app.get("/", (req, res) => { 
     res.json({ message: "Welcome to the library management application." }); 
 }); 

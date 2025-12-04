@@ -1,70 +1,51 @@
-const { ObjectId } = require("mongodb");
-const MongoDB = require("../utils/mongodb.util");
-const BookService = require("./book.service"); // để thay đổi số lượng sách
+const BorrowModel = require("../models/borrow.model");
+const BookModel = require("../models/book.model");
 
 class BorrowService {
-  constructor(client) {
-    this.Borrow = client.db("libraryDB").collection("borrows");
-    this.bookService = new BookService(client);
-  }
-
-  // Lấy tất cả phiếu mượn
-  async find(filter = {}) {
-    return await this.Borrow.find(filter).sort({ createdAt: -1 }).toArray();
-  }
-
-  // Lấy 1 phiếu mượn theo _id
-  async findById(id) {
-    return await this.Borrow.findOne({ _id: new ObjectId(id) });
-  }
-
   // Tạo phiếu mượn
-  async create(data) {
-    if (data.NgayTra && new Date(data.NgayTra) <= new Date(data.NgayMuon)) {
-      throw new Error("Ngày trả phải lớn hơn ngày mượn");
+  async createBorrow(data) {
+    const newBorrow = {
+      ...data,
+      status: "Chưa duyệt",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    return await BorrowModel.create(newBorrow);
+  }
+
+  // Admin xác nhận / từ chối mượn
+  async confirmBorrow(id, approve = true) {
+    const borrow = await BorrowModel.findById(id);
+    if (!borrow) throw new Error("Phiếu mượn không tồn tại");
+
+    let status;
+    if (approve) {
+      status = "Đã xác nhận";
+      await BookModel.changeQuantity(borrow.MaSach, -1);
+    } else {
+      status = "Mượn không thành công";
     }
 
-    // Giảm số lượng sách đi 1
-    await this.bookService.changeQuantity(data.MaSach, -1);
-
-    const result = await this.Borrow.insertOne({
-      ...data,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    });
-
-    return { _id: result.insertedId, ...data };
+    return await BorrowModel.updateStatus(id, status);
   }
 
   // Trả sách
   async returnBook(id, NgayTra) {
-    const borrow = await this.findById(id);
-    if (!borrow) throw new Error("Phiếu mượn không tồn tại");
-    if (new Date(NgayTra) <= new Date(borrow.NgayMuon)) {
-      throw new Error("Ngày trả phải lớn hơn ngày mượn");
-    }
-
-    await this.Borrow.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: { NgayTra, updatedAt: new Date() } }
-    );
-
-    // Tăng số lượng sách lên 1
-    await this.bookService.changeQuantity(borrow.MaSach, 1);
-
-    return { ...borrow, NgayTra };
+    return await BorrowModel.returnBook(id, NgayTra);
   }
 
-  // Xóa phiếu mượn
+  // Lấy tất cả hoặc theo filter
+  async findAll(filter = {}) {
+    return await BorrowModel.findAll(filter);
+  }
+
+  // Xóa phiếu theo _id
   async delete(id) {
-    const result = await this.Borrow.deleteOne({ _id: new ObjectId(id) });
-    return result.deletedCount > 0;
-  }
-
-  // Xóa tất cả phiếu mượn
-  async deleteAll() {
-    const result = await this.Borrow.deleteMany({});
-    return result.deletedCount;
+    const success = await BorrowModel.deleteById(id);
+    if (!success) {
+      throw new Error("Phiếu mượn không tồn tại hoặc đã xóa");
+    }
+    return true;
   }
 }
 

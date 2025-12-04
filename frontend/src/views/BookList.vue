@@ -97,6 +97,7 @@
 <script>
 import BookService from "@/services/book.service";
 import PublisherService from "@/services/publisher.service";
+import "./style.css";
 
 export default {
   data() {
@@ -264,70 +265,3 @@ export default {
 };
 </script>
 
-<style scoped>
-.book-list { max-width:1000px; margin:20px auto; font-family:Arial,sans-serif; color:#333; }
-h2 { text-align:center; margin-bottom:20px; color:#2a2f45; }
-
-.add-btn, .filters button, .edit-btn, .delete-btn, .modal button[type="submit"] {
-  background: linear-gradient(90deg,#4CAF50,#45a049); color:#fff; padding:10px 18px; border:none; border-radius:10px;
-  cursor:pointer; font-weight:600; transition:0.3s; box-shadow:0 4px 8px rgba(0,0,0,0.2);
-}
-.add-btn:hover, .filters button:hover, .edit-btn:hover, .delete-btn:hover, .modal button[type="submit"]:hover {
-  background: linear-gradient(90deg,#45a049,#3e8e41);
-}
-.edit-btn, .delete-btn { padding:6px 12px; font-size:14px; margin-right:5px; }
-.modal button[type="button"] { background-color:#f44336; color:#fff; padding:8px 12px; border-radius:8px; }
-.modal button[type="button"]:hover { background-color:#da190b; }
-
-.modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; z-index:1000; }
-.modal { background-color:#fff; padding:25px; border-radius:12px; width:400px; box-shadow:0 10px 25px rgba(0,0,0,0.3); }
-.modal input, .modal select { width:100%; margin:8px 0; padding:8px 10px; border-radius:6px; border:1px solid #ccc; outline:none; transition:0.2s; }
-.modal input:focus, .modal select:focus { border-color:#4CAF50; box-shadow:0 0 5px rgba(76,175,80,0.5); }
-
-.preview-images { display:flex; gap:10px; flex-wrap:wrap; margin-top:5px; }
-.preview-images img { width:80px; height:100px; object-fit:cover; border-radius:5px; }
-
-.table-images { display:flex; gap:5px; flex-wrap:wrap; }
-.table-img { width:50px; height:70px; object-fit:cover; border-radius:4px; }
-
-.filters { margin-bottom:15px; display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
-.filters input, .filters select, .filters button { padding:8px 12px; font-size:14px; border-radius:8px; border:1px solid #ccc; outline:none; transition:0.2s; }
-.filters input:focus, .filters select:focus { border-color:#4CAF50; box-shadow:0 0 5px rgba(76,175,80,0.4); }
-
-.table-wrapper table { width:100%; border-collapse:collapse; box-shadow:0 2px 10px rgba(0,0,0,0.1); border-radius:10px; overflow:hidden; }
-.table-wrapper table th, .table-wrapper table td { padding:12px 15px; text-align:left; }
-.table-wrapper table th { background-color:#4CAF50; color:#fff; font-weight:600; }
-.table-wrapper table tr:nth-child(even) { background-color:#f7f7f7; }
-.table-wrapper table tr:hover { background-color:#e8f5e9; }
-
-.no-data { text-align:center; color:#999; }
-
-.toast-container {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 2000;
-}
-.toast {
-  margin-bottom: 10px;
-  padding: 12px 18px;
-  border-radius: 8px;
-  color: #fff;
-  font-weight: bold;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  animation: slide-in 0.3s ease;
-}
-.toast.success { background-color: #4CAF50; }
-.toast.error { background-color: #f44336; }
-
-@keyframes slide-in {
-  from { opacity: 0; transform: translateX(100%); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-@media(max-width:600px){
-  .filters{flex-direction:column;align-items:stretch}
-  .table-wrapper table th,.table-wrapper table td{padding:8px}
-  .modal{width:90%;} 
-}
-</style>

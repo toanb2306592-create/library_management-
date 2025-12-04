@@ -1,12 +1,14 @@
 const express = require("express");
-const BorrowController = require("../controllers/borrow.controller");
 const router = express.Router();
+const BorrowController = require("../controllers/borrow.controller");
 
-router.route("/")
-  .get(BorrowController.findAll)
-  .post(BorrowController.create);
+router.get("/", BorrowController.findAll); // lấy danh sách
+router.post("/", BorrowController.create); // tạo phiếu mượn
+router.put("/confirm/:id", BorrowController.confirm); // admin xác nhận
+router.put("/return/:id", BorrowController.returnBook); // trả sách
+router.delete("/:id", BorrowController.delete); // xóa theo id
 
-router.route("/:id/return")
-  .put(BorrowController.returnBook);
+router.patch("/:id/confirm", BorrowController.confirmBorrow);
+router.patch("/:id/reject", BorrowController.rejectBorrow);
 
 module.exports = router;

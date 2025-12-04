@@ -1,23 +1,14 @@
 const express = require("express");
-const PublisherModel = require("../models/publisher.model");
+const publisherController = require("../controllers/publisher.controller");
+
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-  try {
-    const data = await PublisherModel.getAll();
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+router.route("/")
+  .get(publisherController.getAllPublishers)
+  .post(publisherController.createPublisher);
 
-router.post("/", async (req, res) => {
-  try {
-    const newNXB = await PublisherModel.create(req.body);
-    res.json(newNXB);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
+router.route("/:id")
+  .put(publisherController.updatePublisher)
+  .delete(publisherController.deletePublisher);
 
 module.exports = router;

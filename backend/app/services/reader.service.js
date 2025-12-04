@@ -1,54 +1,52 @@
-const { ObjectId } = require("mongodb");
-const MongoDB = require("../utils/mongodb.util");
+const ReaderModel = require("../models/reader.model");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 class ReaderService {
-  constructor(client) {
-    this.Reader = client.db("libraryDB").collection("readers");
-  }
 
-  // Lấy danh sách đọc giả, filter là object MongoDB
-  async find(filter = {}) {
-    return await this.Reader.find(filter).toArray();
-  }
-
-  // Lấy 1 đọc giả theo MaDG
-  async findByMaDG(MaDG) {
-    return await this.Reader.findOne({ MaDG });
-  }
-
-  // Tạo đọc giả mới (nếu chưa có MaDG, tự sinh)
-  async create(data) {
-    if (!data.MaDG) {
-      data.MaDG = Math.random().toString(36).substring(2, 8).toUpperCase();
+  async register(data) {
+    const exists = await ReaderModel.findByEmail(data.email);
+    if (exists) {
+      throw new Error("Email đã được sử dụng!");
     }
-    const result = await this.Reader.insertOne({
-      ...data,
+
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
+    const readerData = {
+      HoLot: data.HoLot,
+      Ten: data.Ten,
+      NgaySinh: data.NgaySinh,
+      Phai: data.Phai,
+      DiaChi: data.DiaChi,
+      DienThoai: data.DienThoai,
+      email: data.email,
+      password: hashedPassword,
       createdAt: new Date(),
-      updatedAt: new Date()
-    });
-    return { _id: result.insertedId, ...data };
+      updatedAt: new Date(),
+    };
+
+    return await ReaderModel.create(readerData);
   }
 
-  // Cập nhật đọc giả theo MaDG
-  async update(MaDG, data) {
-    await this.Reader.updateOne(
-      { MaDG },
-      { $set: { ...data, updatedAt: new Date() } }
+  async login({ email, password }) {
+    const reader = await ReaderModel.findByEmail(email);
+    if (!reader) throw new Error("Email không tồn tại!");
+
+    const isMatch = await bcrypt.compare(password, reader.password);
+    if (!isMatch) throw new Error("Sai mật khẩu!");
+
+    const token = jwt.sign(
+      {
+        id: reader._id,
+        name: reader.Ten,
+        email: reader.email
+      },
+      "SECRET_KEY",
+      { expiresIn: "7d" }
     );
-    return this.findByMaDG(MaDG);
-  }
 
-  // Xóa đọc giả theo MaDG
-  async delete(MaDG) {
-    const result = await this.Reader.deleteOne({ MaDG });
-    return result.deletedCount > 0;
-  }
-
-  // Xóa tất cả đọc giả
-  async deleteAll() {
-    const result = await this.Reader.deleteMany({});
-    return result.deletedCount;
+    return { token, reader };
   }
 }
 
-module.exports = ReaderService;
+module.exports = new ReaderService();

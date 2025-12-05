@@ -17,8 +17,6 @@ class PublisherModel {
 
   static async create(data) {
     const col = await getCollection(this.collectionName);
-
-    // Check mã trùng
     const exists = await col.findOne({ MaNXB: data.MaNXB });
     if (exists) throw new Error("Mã NXB đã tồn tại!");
 
@@ -39,7 +37,7 @@ class PublisherModel {
   static async update(id, data) {
     const col = await getCollection(this.collectionName);
 
-    delete data._id; // bắt buộc xóa
+    delete data._id;
 
     await col.updateOne(
       { _id: new ObjectId(id) },

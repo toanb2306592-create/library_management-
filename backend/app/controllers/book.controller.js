@@ -1,4 +1,3 @@
-// src/controllers/book.controller.js
 const BookModel = require("../models/book.model");
 const ApiError = require("../api-error");
 

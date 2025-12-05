@@ -2,10 +2,8 @@
   <div class="publisher-list">
     <h2>Quản lý Nhà Xuất Bản</h2>
 
-    <!-- Nút thêm NXB -->
     <button class="add-btn" @click="showAddModal = true">Thêm NXB</button>
 
-    <!-- Modal thêm/sửa NXB -->
     <div v-if="showAddModal" class="modal-overlay">
       <div class="modal">
         <h3>{{ editingPublisher ? "Sửa NXB" : "Thêm NXB mới" }}</h3>
@@ -24,13 +22,11 @@
       </div>
     </div>
 
-    <!-- Filter -->
     <div class="filters">
       <input v-model="searchName" placeholder="Tìm theo tên NXB" />
       <button @click="fetchPublishers">Lọc</button>
     </div>
 
-    <!-- Table -->
     <div class="table-wrapper">
       <table>
         <thead>
@@ -124,8 +120,6 @@ export default {
      async updatePublisher() {
       try {
         await PublisherService.update(this.currentPublisher._id, this.currentPublisher);
-
-        // cập nhật ngay trong mảng
         const index = this.publishers.findIndex(p => p._id === this.currentPublisher._id);
         if (index !== -1) {
           this.publishers[index] = { ...this.currentPublisher };
@@ -155,7 +149,6 @@ export default {
       this.messageType = "";
     },
 
-    // ✅ Xóa NXB – API hoạt động đủ
     async deletePublisher(id) {
       if (!confirm("Bạn có chắc muốn xóa nhà xuất bản này không?")) return;
 
@@ -163,7 +156,6 @@ export default {
         await PublisherService.delete(id);
         alert("Xóa thành công!");
 
-        // Load lại danh sách
         this.fetchPublishers();
 
       } catch (error) {
@@ -180,7 +172,6 @@ export default {
 </script>
 
 <style scoped>
-/* Reuse style giống Employee/Sách */
 .publisher-list {
   max-width: 900px;
   margin: 20px auto;

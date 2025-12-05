@@ -2,10 +2,8 @@
   <div class="employee-list">
     <h2>Danh sách nhân viên</h2>
 
-    <!-- Nút thêm nhân viên -->
     <button class="add-btn" @click="showAddModal = true">Thêm nhân viên</button>
 
-    <!-- Modal thêm nhân viên -->
     <div v-if="showAddModal" class="modal-overlay">
       <div class="modal">
         <h3>Thêm nhân viên mới</h3>
@@ -29,7 +27,6 @@
       </div>
     </div>
 
-    <!-- Filter -->
     <div class="filters">
       <input v-model="searchName" placeholder="Tìm theo tên" />
       <select v-model="filterRole">
@@ -41,7 +38,6 @@
       <button @click="fetchEmployees">Lọc</button>
     </div>
 
-    <!-- Table -->
     <div class="table-wrapper">
       <table>
         <thead>
@@ -146,14 +142,12 @@ export default {
   color: #333;
 }
 
-/* Tiêu đề */
 h2 {
   text-align: center;
   margin-bottom: 20px;
   color: #2a2f45;
 }
 
-/* Nút thêm nhân viên */
 .add-btn {
   background: linear-gradient(90deg, #4CAF50, #45a049);
   color: #fff;
@@ -170,7 +164,6 @@ h2 {
   background: linear-gradient(90deg, #45a049, #3e8e41);
 }
 
-/* Modal overlay */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -184,7 +177,6 @@ h2 {
   z-index: 1000;
 }
 
-/* Modal box */
 .modal {
   background-color: #fff;
   padding: 25px;
@@ -194,7 +186,6 @@ h2 {
   transition: all 0.3s ease;
 }
 
-/* Input và select trong modal */
 .modal input,
 .modal select {
   width: 100%;
@@ -211,7 +202,6 @@ h2 {
   box-shadow: 0 0 5px rgba(76,175,80,0.5);
 }
 
-/* Nút trong modal */
 .modal button[type="submit"] {
   background: linear-gradient(90deg, #4CAF50, #45a049);
   color: #fff;
@@ -227,7 +217,6 @@ h2 {
   background: linear-gradient(90deg, #45a049, #3e8e41);
 }
 
-/* Nút hủy modal */
 .modal button[type="button"] {
   background-color: #f44336;
   color: #fff;
@@ -240,7 +229,6 @@ h2 {
   background-color: #da190b;
 }
 
-/* Message thành công hoặc lỗi */
 .message {
   margin-bottom: 12px;
   padding: 8px;
@@ -257,7 +245,6 @@ h2 {
   color: #fff;
 }
 
-/* Filters */
 .filters {
   margin-bottom: 15px;
   display: flex;
@@ -292,7 +279,6 @@ h2 {
   background: linear-gradient(90deg, #45a049, #3e8e41);
 }
 
-/* Table */
 .table-wrapper table {
   width: 100%;
   border-collapse: collapse;
@@ -317,7 +303,6 @@ h2 {
   background-color: #e8f5e9;
 }
 
-/* Nút xóa trong table */
 .delete-btn {
   padding: 6px 12px;
   font-size: 14px;
@@ -334,14 +319,12 @@ h2 {
   background: linear-gradient(90deg, #45a049, #3e8e41);
 }
 
-/* Không có dữ liệu */
 .no-data {
   text-align: center;
   color: #999;
   font-style: italic;
 }
 
-/* Responsive */
 @media (max-width: 600px) {
   .filters {
     flex-direction: column;

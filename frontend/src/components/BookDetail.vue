@@ -16,7 +16,6 @@
 
           <div class="buttons">
             <button class="back-btn" @click="$router.back()">← Quay về</button>
-            <!-- Chỉ hiện nút mượn nếu không phải admin -->
             <button
               v-if="!isAdmin"
               class="borrow-btn"
@@ -45,7 +44,7 @@ export default {
     return {
       book: null,
       publishers: [],
-      user: null, // lưu thông tin user
+      user: null,
     };
   },
   computed: {
@@ -56,7 +55,6 @@ export default {
   methods: {
     async fetchBook() {
       try {
-        // Lấy thông tin sách
         const [bookRes, publishersRes] = await Promise.all([
           BookService.get(this.$route.params.id),
           axios.get("http://localhost:3000/api/publishers")
@@ -70,8 +68,7 @@ export default {
 
         this.book = book;
 
-        // Lấy thông tin user từ localStorage hoặc API
-        const userData = localStorage.getItem("user"); // ví dụ
+        const userData = localStorage.getItem("user"); 
         this.user = userData ? JSON.parse(userData) : null;
 
       } catch (err) {

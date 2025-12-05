@@ -2,7 +2,6 @@
   <div class="borrow-book">
     <h2>Mượn sách</h2>
 
-    <!-- Form mượn sách -->
     <form @submit.prevent="submitBorrow">
       <div class="form-group">
         <label>Chọn sách:</label>
@@ -29,7 +28,6 @@
 
     <p v-if="message" :class="['borrow-message', messageType]">{{ message }}</p>
 
-    <!-- Lịch sử mượn -->
     <h3>Lịch sử mượn</h3>
     <div v-if="borrowHistory.length === 0">Bạn chưa mượn sách nào.</div>
     <ul class="borrow-history">
@@ -88,7 +86,6 @@ export default {
     async fetchBorrowHistory() {
       try {
         const res = await axios.get(`http://localhost:3000/api/borrows?MaDG=${store.user._id}`);
-        // res.data là danh sách phiếu mượn, lấy luôn thông tin sách
         const history = await Promise.all(res.data.map(async (b) => {
           const bookRes = await axios.get(`http://localhost:3000/api/books/${b.MaSach}`);
           return { ...b, book: bookRes.data };
@@ -111,12 +108,10 @@ export default {
         this.message = "Đặt mượn thành công, chờ admin xác nhận!";
         this.messageType = "success";
 
-        // reset form
         this.form.MaSach = "";
         this.form.NgayMuon = "";
         this.form.NgayTra = "";
 
-        // load lại lịch sử
         this.fetchBorrowHistory();
       } catch (err) {
         this.message = err.response?.data?.message || "Đặt mượn thất bại";

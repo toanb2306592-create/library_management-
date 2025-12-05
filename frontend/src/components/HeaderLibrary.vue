@@ -1,7 +1,6 @@
 <template>
   <header :class="['header', { faded }]">
     <div class="header-container">
-      <!-- Logo -->
       <div class="logo">
         <img src="/library-icon.png" alt="Library Icon" />
         <router-link to="/" style="text-decoration: none;">
@@ -9,7 +8,6 @@
         </router-link>
       </div>
 
-      <!-- Menu -->
       <nav class="nav">
         <ul>
           <li><router-link to="/">Trang chủ</router-link></li>
@@ -62,8 +60,8 @@ export default {
       faded: false,
       dropdownOpen: false,
       searchText: "",
-      books: [],          // toàn bộ sách từ backend
-      filteredBooks: []   // sách matching search
+      books: [],         
+      filteredBooks: []   
     };
   },
   setup() {
@@ -79,7 +77,7 @@ export default {
     document.removeEventListener("click", this.handleClickOutside);
   },
   methods: {
-    // Lấy toàn bộ sách để filter
+
     async loadBooks() {
       try {
         const res = await axios.get("http://localhost:3000/api/books");

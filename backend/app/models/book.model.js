@@ -34,7 +34,6 @@ class BookModel {
       NamXuatBan: Number(data.NamXuatBan),
       MaNXB: data.MaNXB,
       image: data.image || [],
-      description: data.description || "",
       createdAt: new Date(),
     };
     const result = await col.insertOne(newBook);

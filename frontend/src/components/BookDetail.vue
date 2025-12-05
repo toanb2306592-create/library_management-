@@ -88,6 +88,13 @@ export default {
       return "/default-book.png";
     },
     borrowBook(bookId) {
+      if (!this.user) {
+        this.$router.push({
+          path: "/login",
+          query: { redirect: `/borrow-book?bookId=${bookId}` } 
+        });
+        return;
+      }
       this.$router.push({ path: "/borrow-book", query: { bookId } });
     }
   },

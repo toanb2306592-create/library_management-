@@ -13,7 +13,7 @@ exports.create = async (req, res) => {
 
 exports.confirm = async (req, res) => {
   try {
-    const approve = req.body.approve; // true hoặc false
+    const approve = req.body.approve; 
     const borrow = await BorrowModel.findById(req.params.id);
 
     if (!borrow) return res.status(404).json({ message: "Không tìm thấy phiếu mượn" });

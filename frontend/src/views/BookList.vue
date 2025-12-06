@@ -2,10 +2,8 @@
   <div class="book-list">
     <h2>Quản lý sách</h2>
 
-    <!-- Nút thêm sách -->
     <button class="add-btn" @click="openAddModal">Thêm sách</button>
 
-    <!-- Modal thêm/sửa sách -->
     <div v-if="showModal" class="modal-overlay">
       <div class="modal">
         <h3>{{ editingBook ? "Sửa sách" : "Thêm sách mới" }}</h3>
@@ -37,7 +35,6 @@
       </div>
     </div>
 
-    <!-- Filter -->
     <div class="filters">
       <input v-model="searchName" placeholder="Tìm theo tên sách" />
       <select v-model="searchNXB">
@@ -47,7 +44,6 @@
       <button @click="fetchBooks">Lọc</button>
     </div>
 
-    <!-- Table -->
     <div class="table-wrapper">
       <table>
         <thead>

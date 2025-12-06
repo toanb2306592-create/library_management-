@@ -51,7 +51,6 @@ export default {
           password: this.password
         });
 
-        // lưu user reactive global
         store.user = res.data.reader;
         localStorage.setItem("user", JSON.stringify(res.data.reader));
 

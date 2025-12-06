@@ -10,7 +10,6 @@
 
       <nav class="nav">
         <ul>
-          <li><router-link to="/">Trang chủ</router-link></li>
           <template v-if="store.user?.email === 'admin@gmail.com'">
             <li><router-link to="/book">Sách</router-link></li>
             <li><router-link to="/publisher">Nhà xuất bản</router-link></li>
@@ -18,6 +17,7 @@
             <li><router-link to="/borrow">Quản lý mượn sách</router-link></li>
           </template>
           <template v-if="store.user?.email !== 'admin@gmail.com'">
+            <li><router-link to="/">Trang chủ</router-link></li>
             <li><router-link to="/borrow-book">Mượn sách</router-link></li>
           </template>
         </ul>

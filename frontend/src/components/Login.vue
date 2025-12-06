@@ -58,7 +58,7 @@ export default {
         this.message = "Đăng nhập thành công!";
         this.messageType = "success";
 
-        setTimeout(() => this.$router.push("/"), 500);
+        setTimeout(() => this.$router.push("/book"), 500);
       } catch (err) {
         this.message = err.response?.data?.message || "Sai email hoặc mật khẩu";
         this.messageType = "error";

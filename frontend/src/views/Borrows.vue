@@ -28,9 +28,9 @@
             <span :class="statusClass(b.status)">{{ b.status }}</span>
           </td>
           <td v-if="isAdmin">
-            <button v-if="b.status === 'Chưa duyệt'" @click="confirmBorrow(b._id, true)">Xác nhận</button>
-            <button v-if="b.status === 'Chưa duyệt'" @click="confirmBorrow(b._id, false)">Từ chối</button>
-            <button @click="deleteBorrow(b)" style="background-color:red; color:white;">Xóa</button>
+            <button v-if="b.status === 'Chưa duyệt'" @click="confirmBorrow(b._id, true)" class="btn">Xác nhận</button>
+            <button v-if="b.status === 'Chưa duyệt'" @click="confirmBorrow(b._id, false)" class="btn">Từ chối</button>                     
+            <button @click="deleteBorrow(b)" class="btn-delete">Xóa</button>
           </td>
         </tr>
       </tbody>
@@ -155,6 +155,30 @@ export default {
 .status-failed { color: red; font-weight: bold; }
 .status-returned { color: blue; font-weight: bold; }
 
+.btn {
+  padding: 6px 12px;
+  font-size: 14px;
+  background: linear-gradient(90deg, #4CAF50, #45a049);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+.btn-delete {
+  padding: 6px 12px;
+  font-size: 14px;
+  background: linear-gradient(90deg, #c10a0a, #c10a0a);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
 button {
   margin: 0 3px;
   padding: 0.3rem 0.6rem;
